@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "cloudlabMcp": {
+      "command": "C:\\Users\\RishabhMishra\\Documents\\MCP\\1\\.venv\\Scripts\\python.exe",
+      "args": ["C:\\Users\\RishabhMishra\\Documents\\MCP\\1\\server.py"],
+      "env": {
+        "CLOUDLAB_BASE_URL": "http://localhost:9999",
+        "CLOUDLAB_USERNAME": "dev5",
+        "CLOUDLAB_PASSWORD": "Rishabh@7080",
+        "CLOUDLAB_COMPANY_ID": "65",
+        "CLOUDLAB_TEAM_ID": "149",
+        "CLOUDLAB_USERNAME_SUFFIX": "rishanh",
+        "CLOUDLAB_PLAN_ID": "165"
+      }
+    }
+  }
+}
