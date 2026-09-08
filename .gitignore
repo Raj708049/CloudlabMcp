@@ -1,0 +1,13 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Local IDE / MCP config (contains real credentials — do not commit)
+.cursor/
+
+# Local secrets override
+secrets.local.*

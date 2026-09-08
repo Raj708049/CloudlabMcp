@@ -1,0 +1,54 @@
+# Smithery deployment config: https://smithery.ai/docs/build/project-config
+runtime: "container"
+
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
+
+startCommand:
+  type: "http"
+  # Fields the user fills in on Smithery when configuring the server.
+  configSchema:
+    type: object
+    required:
+      - baseUrl
+      - username
+      - password
+      - companyId
+      - teamId
+      - usernameSuffix
+      - planId
+    properties:
+      baseUrl:
+        type: string
+        description: "CloudLab API base URL. MUST be reachable from Smithery's cloud (a public URL or a tunnel), NOT localhost."
+      username:
+        type: string
+        description: "CloudLab login username."
+      password:
+        type: string
+        description: "CloudLab login password."
+      companyId:
+        type: string
+        description: "CloudLab company id."
+      teamId:
+        type: string
+        description: "CloudLab team id."
+      usernameSuffix:
+        type: string
+        description: "Prefix used when generating new user emails."
+      planId:
+        type: string
+        description: "CloudLab plan id used for subscriptions."
+  exampleConfig:
+    baseUrl: "https://your-cloudlab-host.example.com"
+    username: "your-username"
+    password: "your-password"
+    companyId: "65"
+    teamId: "149"
+    usernameSuffix: "rishanh"
+    planId: "165"
+
+# The server always runs in HTTP mode inside the container.
+env:
+  MCP_TRANSPORT: "streamable-http"
