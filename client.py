@@ -63,6 +63,16 @@ class CloudLabClient:
         if not self._logged_in:
             await self.login()
 
+    def reset_auth(self) -> None:
+        """Clear cached token/session so the next call re-authenticates.
+
+        Used when config (credentials) changes at runtime, e.g. Smithery
+        passing different per-request config.
+        """
+        self._token = None
+        self._logged_in = False
+        self._http.cookies.clear()
+
     def _base_headers(self) -> dict[str, str]:
         """Headers sent on every authenticated (non-login) request.
 

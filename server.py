@@ -319,6 +319,54 @@ async def provision_lab(
 # More API tools get added below, one per API you provide.
 
 
+@mcp.custom_route("/.well-known/mcp/server-card.json", methods=["GET"])
+async def server_card(request):
+    """Static server card so Smithery can read metadata without scanning.
+
+    Smithery's scanner sometimes fails to initialize the MCP session (422);
+    advertising this endpoint lets it skip scanning and read tools directly.
+    """
+    from starlette.responses import JSONResponse
+
+    tools = await mcp.list_tools()
+    return JSONResponse(
+        {
+            "serverInfo": {"name": "cloudlabMcp", "version": "1.0.0"},
+            "authentication": {"required": False},
+            "tools": [
+                {
+                    "name": t.name,
+                    "description": t.description or "",
+                    "inputSchema": t.input_schema,
+                }
+                for t in tools
+            ],
+            "resources": [],
+            "prompts": [],
+        }
+    )
+
+
 if __name__ == "__main__":
-    # Runs over stdio — the transport Cline / Cursor use for local MCP servers.
-    mcp.run()
+    import os
+
+    # Transport is chosen via env var so the same file works both ways:
+    #   MCP_TRANSPORT=stdio           -> local child process (Cline/Cursor, default)
+    #   MCP_TRANSPORT=streamable-http -> hosted HTTP server (Smithery / any host)
+    transport = os.environ.get("MCP_TRANSPORT", "stdio")
+    if transport in ("streamable-http", "sse"):
+        import uvicorn
+
+        from middleware import SmitheryConfigMiddleware
+
+        host = os.environ.get("MCP_HOST", "0.0.0.0")
+        # Smithery (and many PaaS) inject the port via PORT; fall back to MCP_PORT.
+        port = int(os.environ.get("PORT") or os.environ.get("MCP_PORT") or "8000")
+
+        # Build the HTTP app and attach middleware that reads Smithery's
+        # per-request ?config=<base64 json> parameter.
+        app = mcp.streamable_http_app()
+        app.add_middleware(SmitheryConfigMiddleware)
+        uvicorn.run(app, host=host, port=port)
+    else:
+        mcp.run()
